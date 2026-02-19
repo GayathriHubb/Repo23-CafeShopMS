@@ -260,7 +260,7 @@ namespace CafeShopMS
 
         private void BtnPay_Click(object sender, EventArgs e)
         {
-            if (TxtBxTenCash.Text == string.Empty || DGVOrders.Rows.Count == 0)
+            if (NUDCash.Text == string.Empty || DGVOrders.Rows.Count == 0)
             {
                 MessageBox.Show("Something Went Wrong", "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
             }
@@ -285,7 +285,7 @@ namespace CafeShopMS
                             {
                                 inscmd.Parameters.AddWithValue("@custid", idgen);
                                 inscmd.Parameters.AddWithValue("@totprice", totalprice);
-                                inscmd.Parameters.AddWithValue("@amnt", TxtBxTenCash.Text.Trim());
+                                inscmd.Parameters.AddWithValue("@amnt", NUDCash.Value);
                                 inscmd.Parameters.AddWithValue("@change", TxtBxTenChange.Text.Trim());
                                 inscmd.Parameters.AddWithValue("@orddt", DateTime.Today);
 
@@ -309,7 +309,7 @@ namespace CafeShopMS
         {
             try
             {
-                if (TxtBxTenCash.Text == string.Empty || DGVOrders.Rows.Count < 0)
+                if (NUDCash.Text == string.Empty || DGVOrders.Rows.Count < 0)
                 {
                     MessageBox.Show("Please Order First", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                     return;
@@ -323,34 +323,8 @@ namespace CafeShopMS
             }
         }
 
-        private void TxtBxTenCash_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                try
-                {
-                    float getamount = Convert.ToSingle(TxtBxTenCash.Text);
-                    float getchange = getamount - totalprice;
+        
 
-                    if (getchange <= -1)
-                    {
-                        TxtBxTenCash.Text = string.Empty;
-                        TxtBxTenChange.Text = string.Empty;
-                    }
-                    else
-                    {
-                        TxtBxTenChange.Text = getchange.ToString();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "TxtBx KeyDown - Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
-                    TxtBxTenCash.Text = string.Empty;
-                    TxtBxTenChange.Text = string.Empty;
-                }
-
-            }
-        }
         private void ClearFields()
         {
             CmbBxPType.Text = string.Empty;
@@ -392,7 +366,6 @@ namespace CafeShopMS
         }
 
         int rowindex;
-       
         private void PD1_PrintPage(object sender, PrintPageEventArgs e)
         {
             DisplayTotalPrice();
@@ -473,7 +446,7 @@ namespace CafeShopMS
 
             // ✅ Summary Price Section
             DrawRightAligned(e.Graphics, "TotalPrice(₹):", $"{totalprice: 0.00}", font, left, ref y);
-            DrawRightAligned(e.Graphics, "TenderedCash(₹):", $"{TxtBxTenCash.Text: 0.00}", font, left, ref y);
+            DrawRightAligned(e.Graphics, "TenderedCash(₹):", $"{NUDCash.Value: 0.00}", font, left, ref y);
             DrawRightAligned(e.Graphics, "TenderedChange(₹):", $"{TxtBxTenChange.Text: 0.00}", font, left, ref y);
 
             y += 30;
@@ -579,6 +552,25 @@ namespace CafeShopMS
         }
 
         int stockafteradd;
+
+        private void NUDCash_ValueChanged(object sender, EventArgs e)
+        {
+            float getamount = Convert.ToSingle(NUDCash.Value); 
+            float change = getamount - totalprice;
+
+            if (change <= -1)
+            {
+                NUDCash.Text = string.Empty;
+                TxtBxTenChange.Text = string.Empty;
+                MessageBox.Show("Insufficient Cash", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                NUDCash.Focus();    
+            }
+            else
+            {
+                TxtBxTenChange.Text = change.ToString();
+            }
+        }
+
         private void UpdateStockWhenAdd()
         {
             using (SqlConnection sqlcon = new SqlConnection(constring))
