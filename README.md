@@ -41,3 +41,19 @@ Product inventory management with stock tracking,
 Order history and transaction records,
 Customer data storage,
 User credentials and role management
+
+Key Workflows
+Login Flow:
+
+User enters credentials → Validated against Users table
+Check status (Active/Approval) → If approved, fetch user role
+Route to appropriate form (Admin or Cashier)
+
+Order Management Flow:
+
+Cashier selects available products,
+Creates order with quantities,
+System calculates total price,
+Order saved to database with timestamp
+
+This is a practical, production-like cafe management system with proper role-based security, database integration, and modular UI design.
